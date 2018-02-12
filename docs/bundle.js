@@ -60,34 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(1);
-module.exports = __webpack_require__(3);
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
-
-
-__WEBPACK_IMPORTED_MODULE_0_jquery___default()(document).ready(() => {
-  // have fun!
-})
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -10347,13 +10324,180 @@ return jQuery;
 
 
 /***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = getTopWord;
+/* harmony export (immutable) */ __webpack_exports__["b"] = postToApi;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__response_handlers_basic_response_handler__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__response_handlers_word_response_handler__ = __webpack_require__(2);
+const $ = __webpack_require__(0)
+const url = `https://wordwatch-api.herokuapp.com`
+
+
+
+
+function getTopWord() {
+  fetch(`${url}/api/v1/top_word`)
+    .then(response => Object(__WEBPACK_IMPORTED_MODULE_0__response_handlers_basic_response_handler__["a" /* handleResponse */])(response))
+    .then(topWord => Object(__WEBPACK_IMPORTED_MODULE_1__response_handlers_word_response_handler__["b" /* putTopWordOnPage */])(topWord))
+    .catch(error => console.error({ error }))
+}
+
+function postToApi(wordName) {
+  console.log(wordName)
+  var postOptions = {
+  method: "POST",
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({ word : { value: wordName } }),
+  }
+
+  fetch(`${url}/api/v1/words`, postOptions)
+  .then(response => Object(__WEBPACK_IMPORTED_MODULE_0__response_handlers_basic_response_handler__["a" /* handleResponse */])(response))
+  .then(message => console.log(message))
+  .catch(error => console.error({ error }))
+}
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["b"] = putTopWordOnPage;
+/* harmony export (immutable) */ __webpack_exports__["a"] = postWordsAndCountAsSize;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__fetch_requests_word__ = __webpack_require__(1);
+const $ = __webpack_require__(0)
+
+
+function putTopWordOnPage(topWord) {
+  $('#top_word').append(`${Object.keys(topWord.word)[0]} (${topWord.word[Object.keys(topWord.word)[0]]})`)
+}
+
+function postWordsAndCountAsSize(event) {
+  var innerTextForSize = event.currentTarget.parentElement.children[1].value.toLowerCase()
+  var punctuationless = innerTextForSize.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+  var finalString = punctuationless.replace(/\s{2,}/g," ");
+  var wordArray = finalString.split(" ")
+  $('#word-and-word-countSize').empty();
+
+  var frequency = sortByFrequency(wordArray);
+  postWordOnHtml(frequency);
+  allWordsSendToApi(wordArray);
+}
+
+function sortByFrequency(wordArray) {
+	var frequency = {};
+
+	wordArray.forEach(
+		function(value) {
+      frequency[value] = 0;
+    }
+	);
+  for (var i=0; i < wordArray.length; i++) {
+    if(frequency[wordArray[i]] != undefined) {
+      frequency[wordArray[i]] += 1
+    };
+  };
+  return frequency
+};
+
+function postWordOnHtml(frequency) {
+  var words = Object.keys(frequency)
+  for (var i=0; i < words.length; i++) {
+    $('#word-and-word-countSize').append(`<p id="${words[i]}-word">${words[i]}</p></br>`);
+    var fontSize = frequency[words[i]]
+    $(`#${words[i]}-word`).css("font-size", `${fontSize}em`);
+  };
+};
+
+
+function allWordsSendToApi(wordArray) {
+  wordArray.forEach(function(word) {
+    var wordName = word
+    Object(__WEBPACK_IMPORTED_MODULE_0__fetch_requests_word__["b" /* postToApi */])(wordName);
+  });
+}
+
+
+/***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(4);
+module.exports = __webpack_require__(7);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_jquery___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_jquery__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_fetch_requests_word__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lib_event_listeners_word_event_listeners__ = __webpack_require__(6);
+
+
+
+
+__WEBPACK_IMPORTED_MODULE_0_jquery___default()(document).ready(() => {
+  Object(__WEBPACK_IMPORTED_MODULE_1__lib_fetch_requests_word__["a" /* getTopWord */])()
+  Object(__WEBPACK_IMPORTED_MODULE_2__lib_event_listeners_word_event_listeners__["a" /* addEventListeners */])()
+})
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = handleResponse;
+function handleResponse(response) {
+  return response.json()
+    .then(json => {
+      if (!response.ok) {
+        const error = {
+          status: response.status,
+          statusText: response.statusText,
+          json,
+        }
+        return Promise.reject(error)
+      }
+      return json
+    })
+}
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = addEventListeners;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__response_handlers_word_response_handler__ = __webpack_require__(2);
+const $ = __webpack_require__(0)
+
+
+function addEventListeners() {
+  $('#break-down-button').on('click', function() {
+  event.preventDefault();
+  Object(__WEBPACK_IMPORTED_MODULE_0__response_handlers_word_response_handler__["a" /* postWordsAndCountAsSize */])(event);
+  })
+
+}
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(4);
+var content = __webpack_require__(8);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -10361,7 +10505,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(6)(content, options);
+var update = __webpack_require__(10)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -10378,10 +10522,10 @@ if(false) {
 }
 
 /***/ }),
-/* 4 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(5)(undefined);
+exports = module.exports = __webpack_require__(9)(undefined);
 // imports
 exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700);", ""]);
 
@@ -10392,7 +10536,7 @@ exports.push([module.i, "/* http://meyerweb.com/eric/tools/css/reset/ \n   v2.0 
 
 
 /***/ }),
-/* 5 */
+/* 9 */
 /***/ (function(module, exports) {
 
 /*
@@ -10474,7 +10618,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 6 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -10520,7 +10664,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(7);
+var	fixUrls = __webpack_require__(11);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -10833,7 +10977,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 7 */
+/* 11 */
 /***/ (function(module, exports) {
 
 
